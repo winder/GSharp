@@ -19,10 +19,9 @@ matrix:
             - gcc-mingw-w64
             - g++-mingw-w64
 
-before_script:
+script:
   - mkdir build
   - cd build
   - cmake -D CMAKE_BUILD_TYPE=Release -D CMAKE_TOOLCHAIN_FILE=../external/cmake_toolchain_templates/$TOOLCHAIN ..
-
-script: make
+  - make
 
