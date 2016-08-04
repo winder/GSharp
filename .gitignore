@@ -42,7 +42,6 @@ gsharp_test
 **/obj/
 
 # CMake temporary files
-*.cmake
 CMakeCache.txt
 **/CMakeFiles
 **/Testing
