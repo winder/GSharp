@@ -19,16 +19,6 @@ matrix:
             - gcc-mingw-w64
             - g++-mingw-w64
 
-env:
-  - BUILDMODE=custom
-  - BUILDMODE=cmake
-  - BUILDMODE=cmake-mingw32
-
-matrix:
-  exclude:
-    - compiler: clang
-      env: BUILDMODE=cmake-mingw32
-
 before_script:
   - mkdir build
   - cd build
