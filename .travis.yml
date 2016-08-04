@@ -18,6 +18,10 @@ matrix:
             - g++-mingw-w64-x86-64
             - gcc-mingw-w64
             - g++-mingw-w64
+addons:
+  apt:
+    packages:
+      - cmake
 
 script:
   - mkdir build
