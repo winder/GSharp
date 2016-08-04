@@ -55,5 +55,4 @@ script:
       cmake -DCMAKE_TOOLCHAIN_FILE=toolchain.cmake .. &&
       make;
     fi
-Contact GitHub API Training Shop Blog About
 
