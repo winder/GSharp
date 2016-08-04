@@ -1,8 +1,23 @@
 language: cpp
 
-compiler:
-  - gcc
-  - clang
+matrix:
+  include:
+    # Linux build
+    - os: linux
+      env: TOOLCHAIN=local.cmake
+    # Windows build
+    - os: linux
+      env: TOOLCHAIN=linux_to_windows.cmake
+      addons:
+        apt:
+          packages:
+            - g++-mingw-w64-base
+            - gcc-mingw-w64-base
+            - binutils-mingw-w64-x86-64
+            - gcc-mingw-w64-x86-64
+            - g++-mingw-w64-x86-64
+            - gcc-mingw-w64
+            - g++-mingw-w64
 
 env:
   - BUILDMODE=custom
@@ -15,44 +30,9 @@ matrix:
       env: BUILDMODE=cmake-mingw32
 
 before_script:
-  - sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
-  - sudo add-apt-repository --yes ppa:tobydox/mingw
-  - sudo apt-get -qq update
-  - sudo apt-get -qq install libsmbclient-dev libssh2-1-dev
-  - sudo apt-get -qq install gcc-4.8 g++-4.8
-  - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 20
-  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 20
-  - sudo update-alternatives --config gcc
-  - sudo update-alternatives --config g++
-  - if [ "$BUILDMODE" = "cmake-mingw32" ]; then sudo apt-get -qq install mingw64-x-gcc; fi
+  - mkdir build
+  - cd build
+  - cmake -D CMAKE_BUILD_TYPE=Release -D CMAKE_TOOLCHAIN_FILE=../external/cmake_toolchain_templates/"$TOOLCHAIN" ..
 
-script:
-  - if [ "$BUILDMODE" = "custom" ]; then
-      echo "===> Building with custom buildsystem..." &&
-      cd "$TRAVIS_BUILD_DIR"/wcm &&
-      make all -B;
-    fi
-  - if [ "$BUILDMODE" = "cmake" ]; then
-      echo "===> Building with cmake..." &&
-      cd "$TRAVIS_BUILD_DIR" &&
-      mkdir build &&
-      cd build &&
-      cmake .. &&
-      make;
-    fi
-  - if [ "$BUILDMODE" = "cmake-mingw32" ]; then echo "===> Building with cmake+mingw32..." &&
-      cd "$TRAVIS_BUILD_DIR" &&
-      mkdir build &&
-      cd build &&
-      echo "SET(CMAKE_SYSTEM_NAME Windows)" > toolchain.cmake &&
-      echo "SET(CMAKE_C_COMPILER /opt/mingw64/bin/x86_64-w64-mingw32-gcc)" >> toolchain.cmake &&
-      echo "SET(CMAKE_CXX_COMPILER /opt/mingw64/bin/x86_64-w64-mingw32-g++)" >> toolchain.cmake &&
-      echo "SET(CMAKE_RC_COMPILER /opt/mingw64/bin/x86_64-w64-mingw32-windres)" >> toolchain.cmake &&
-      echo "SET(CMAKE_FIND_ROOT_PATH /opt/mingw64)" >> toolchain.cmake &&
-      echo "SET(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)" >> toolchain.cmake &&
-      echo "SET(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)" >> toolchain.cmake &&
-      echo "SET(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)" >> toolchain.cmake &&
-      cmake -DCMAKE_TOOLCHAIN_FILE=toolchain.cmake .. &&
-      make;
-    fi
+script: make
 
